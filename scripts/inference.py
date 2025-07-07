@@ -120,7 +120,7 @@ def main(config, args):
     ps.print_stats(top_n)  # Get the top N stats
 
     # Prepare the output
-    output = "Top {top_n} Time-Consuming Functions:\n"
+    output = f"Top {top_n} Time-Consuming Functions:\n"
     output += "-" * 50 + "\n"
     output += s.getvalue()
 
@@ -129,7 +129,7 @@ def main(config, args):
     with open(profiling_filename, "w") as f:
         f.write(output)
 
-    print("Profiling results saved to {profiling_filename}")
+    print("Profiling results saved to {}".format(profiling_filename))
 
 
 if __name__ == "__main__":

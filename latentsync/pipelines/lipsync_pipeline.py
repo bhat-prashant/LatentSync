@@ -6,6 +6,7 @@ import os
 import shutil
 from typing import Callable, List, Optional, Union
 import subprocess
+from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 import torch
@@ -249,13 +250,22 @@ class LipsyncPipeline(DiffusionPipeline):
         images = images.cpu().numpy()
         return images
 
+    def affine_transform_frame(self, frame):
+        # This method transforms a single frame.
+        return self.image_processor.affine_transform(frame)
+
     def affine_transform_video(self, video_frames: np.ndarray):
         faces = []
         boxes = []
         affine_matrices = []
         print(f"Affine transforming {len(video_frames)} faces...")
-        for frame in tqdm.tqdm(video_frames):
-            face, box, affine_matrix = self.image_processor.affine_transform(frame)
+
+        # Use ThreadPoolExecutor for parallel processing
+        with ThreadPoolExecutor() as executor:
+            results = list(tqdm.tqdm(executor.map(self.affine_transform_frame, video_frames), total=len(video_frames)))
+
+        # Unpack results into separate lists
+        for face, box, affine_matrix in results:
             faces.append(face)
             boxes.append(box)
             affine_matrices.append(affine_matrix)
