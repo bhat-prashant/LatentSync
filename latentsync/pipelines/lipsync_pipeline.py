@@ -273,19 +273,38 @@ class LipsyncPipeline(DiffusionPipeline):
         faces = torch.stack(faces)
         return faces, boxes, affine_matrices
 
+
+    def process_face(self, index, face, video_frame, box, affine_matrix):
+        x1, y1, x2, y2 = box
+        height = int(y2 - y1)
+        width = int(x2 - x1)
+        
+        # Resize the face tensor
+        face_resized = torchvision.transforms.functional.resize(
+            face, size=(height, width), interpolation=transforms.InterpolationMode.BICUBIC, antialias=True
+        )
+        
+        # Call the restoration function (assuming it's defined in the same class context)
+        out_frame = self.image_processor.restorer.restore_img(video_frame, face_resized, affine_matrix)
+        
+        return out_frame
+
     def restore_video(self, faces: torch.Tensor, video_frames: np.ndarray, boxes: list, affine_matrices: list):
         video_frames = video_frames[: len(faces)]
         out_frames = []
         print(f"Restoring {len(faces)} faces...")
-        for index, face in enumerate(tqdm.tqdm(faces)):
-            x1, y1, x2, y2 = boxes[index]
-            height = int(y2 - y1)
-            width = int(x2 - x1)
-            face = torchvision.transforms.functional.resize(
-                face, size=(height, width), interpolation=transforms.InterpolationMode.BICUBIC, antialias=True
-            )
-            out_frame = self.image_processor.restorer.restore_img(video_frames[index], face, affine_matrices[index])
-            out_frames.append(out_frame)
+        
+        with ThreadPoolExecutor() as executor:
+            # Map the processing function across the data
+            futures = [
+                executor.submit(self.process_face, index, faces[index], video_frames[index], boxes[index], affine_matrices[index])
+                for index in range(len(faces))
+            ]
+            
+            # Gather results as they complete
+            for future in tqdm.tqdm(futures):
+                out_frames.append(future.result())
+
         return np.stack(out_frames, axis=0)
 
     def loop_video(self, whisper_chunks: list, video_frames: np.ndarray):
