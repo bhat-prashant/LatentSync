@@ -23,8 +23,17 @@ from accelerate.utils import set_seed
 from latentsync.whisper.audio2feature import Audio2Feature
 from DeepCache import DeepCacheSDHelper
 
+import cProfile
+import pstats
+import io
+
 
 def main(config, args):
+
+    # Profiling 
+    pr = cProfile.Profile()
+    pr.enable()
+
     if not os.path.exists(args.video_path):
         raise RuntimeError(f"Video path '{args.video_path}' not found")
     if not os.path.exists(args.audio_path):
@@ -99,6 +108,28 @@ def main(config, args):
         mask_image_path=config.data.mask_image_path,
         temp_dir=args.temp_dir,
     )
+
+    # Print profiler output
+    pr.disable()
+    s = io.StringIO()
+    sortby = pstats.SortKey.CUMULATIVE
+    ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+
+    # Capture the stats
+    top_n = 20
+    ps.print_stats(top_n)  # Get the top N stats
+
+    # Prepare the output
+    output = "Top {top_n} Time-Consuming Functions:\n"
+    output += "-" * 50 + "\n"
+    output += s.getvalue()
+
+    # Save to file (overwrites existing file)
+    profiling_filename = "./temp/profiling_results.txt"
+    with open(profiling_filename, "w") as f:
+        f.write(output)
+
+    print("Profiling results saved to {profiling_filename}")
 
 
 if __name__ == "__main__":
