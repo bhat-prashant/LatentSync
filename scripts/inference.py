@@ -107,6 +107,7 @@ def main(config, args):
         height=config.data.resolution,
         mask_image_path=config.data.mask_image_path,
         temp_dir=args.temp_dir,
+        image_enhance=args.image_enhance
     )
 
     # Print profiler output
@@ -144,6 +145,7 @@ if __name__ == "__main__":
     parser.add_argument("--temp_dir", type=str, default="temp")
     parser.add_argument("--seed", type=int, default=1247)
     parser.add_argument("--enable_deepcache", action="store_true")
+    parser.add_argument("--image_enhance", action="store_true")
     args = parser.parse_args()
 
     config = OmegaConf.load(args.unet_config_path)

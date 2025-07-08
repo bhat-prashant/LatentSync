@@ -37,6 +37,7 @@ from ..utils.image_processor import ImageProcessor, load_fixed_mask
 from ..whisper.audio2feature import Audio2Feature
 import tqdm
 import soundfile as sf
+from  ..utils.enhancer import VideoEnhancer
 
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
 
@@ -351,6 +352,7 @@ class LipsyncPipeline(DiffusionPipeline):
         width: Optional[int] = None,
         num_inference_steps: int = 20,
         guidance_scale: float = 1.5,
+        image_enhance: bool = False,
         weight_dtype: Optional[torch.dtype] = torch.float16,
         eta: float = 0.0,
         mask_image_path: str = "latentsync/utils/mask.png",
@@ -362,6 +364,10 @@ class LipsyncPipeline(DiffusionPipeline):
     ):
         is_train = self.unet.training
         self.unet.eval()
+        
+        self.image_enhance = image_enhance
+        if self.image_enhance:
+            self.enhancer = VideoEnhancer()
 
         check_ffmpeg_installed()
 
@@ -484,6 +490,12 @@ class LipsyncPipeline(DiffusionPipeline):
             decoded_latents = self.paste_surrounding_pixels_back(
                 decoded_latents, ref_pixel_values, 1 - masks, device, weight_dtype
             )
+
+            if self.image_enhance:
+                # Enhance those frames which tend to be blurred around mouth region. 
+                for dec_lat in decoded_latents:
+                    dec_lat = self.enhancer.enhance_image(dec_lat)
+
             synced_video_frames.append(decoded_latents)
 
         synced_video_frames = self.restore_video(torch.cat(synced_video_frames), video_frames, boxes, affine_matrices)
