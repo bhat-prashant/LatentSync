@@ -95,16 +95,16 @@ While LatentSync often yields clearer faces than pixel-domain diffusion, very hi
   </tr>
   <tr>
     <td>
-      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo4_video.mp4 controls preload></video>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo3_video.mp4 controls preload></video>
     </td>
     <td>
-      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo4_video.mp4 controls preload></video>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo3_video.mp4 controls preload></video>
     </td>
     <td>
-      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo4_video.mp4 controls preload></video>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo3_video.mp4 controls preload></video>
     </td>
     <td>
-      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo4_video.mp4 controls preload></video>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo3_video.mp4 controls preload></video>
     </td>
   </tr>
 </table>
