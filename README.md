@@ -10,10 +10,10 @@
 </div>
 
 
-## 📖 Introduction
-This repo contains optimization efforts, in terms of both quality and speed, to improve LatentSync infernece. The major updates are as follows:
+## 📖 Improvements and roadmap
+This repo contains optimization efforts (as a part of VidLab7 take-home test), in terms of both quality and speed, to improve LatentSync infernece. The major updates are as follows:
 
-- Profiler `cProfile` added. The four major performance bottlenecks include:
+- Profiler `cProfile` added to this repo. The four major performance bottlenecks found were:
   - [Affine transformation](https://github.com/bytedance/LatentSync/blob/main/latentsync/pipelines/lipsync_pipeline.py#L252)
   - [FaceAnalysis](https://github.com/bytedance/LatentSync/blob/main/latentsync/utils/face_detector.py#L10)
   - [Denoising steps](https://github.com/bytedance/LatentSync/blob/main/latentsync/pipelines/lipsync_pipeline.py#L426)
@@ -34,19 +34,30 @@ With regard to optimizing the denoising steps, it can be done in several ways:
 
 Due to limited GPU credits and time, I haven't had a chance to dig deeper into the aforementioned aspects. Coupled with extensive hyper-parameter tuning, the above optimizations can yield substantial improvements in terms of speed and efficiency. Last, but not the least, inference optimization can also be achieved through hardware-aware inference engines such as ONNX, TensorRT or NVIDIA Triton. 
 
+#### Super-Resolution 
+
+While LatentSync often yields clearer faces than pixel-domain diffusion, very high-quality frames can still appear slightly blurry or distorted under constrained settings. The official implementation notes that more sampling steps produce sharper images (at the cost of slower inference). Tuning the classifier-free guidance similarly shows trade-offs: increasing the guidance scale improves lipsync accuracy but may introduce visual jitter or artifacts . In practice, addressing this requires more compute or model capacity. For example, using more diffusion steps or upgrading to a larger latent model (e.g. SDXL) and running at higher resolution (512×512) can sharpen details, albeit with higher VRAM usage. Post-processing (e.g. super-resolution or sharpening filters) can also help. 
+
+[VideoEnhancer](https://github.com/bhat-prashant/LatentSync/blob/main/latentsync/utils/enhancer.py) within this repo does exactly the same: upscales those syncronized, processed frames which are blurred in the regions that overlaps with the mask (mouth region). This is still Proof-of-Concept implementation aimed at showcasing the usefulness of such an approach in LatentSync. Further optimizations are very necessary to integrate this fully into inference pipeline. 
+
+
 
 
 ## 🎬 Demo
 
 <table class="center">
   <tr style="font-weight: bolder;text-align:center;">
-        <td width="32%"><b>Original video</b></td>
-        <td width="32%"><b>Lip-synced video</b></td>
-        <td width="32%"><b>Optimized Lip-synced video</b></td>
+        <td width="24%"><b>Original video</b></td>
+        <td width="24%"><b>Lip-synced video</b></td>
+        <td width="24%"><b>Optimized Lip-synced video</b></td>
+        <td width="24%"><b>Optimized, super-resolution video</b></td>
   </tr>
   <tr>
     <td>
       <video src=https://github.com/user-attachments/assets/b778e3c3-ba25-455d-bdf3-d89db0aa75f4 controls preload></video>
+    </td>
+    <td>
+      <video src=https://github.com/user-attachments/assets/ac791682-1541-4e6a-aa11-edd9427b977e controls preload></video>
     </td>
     <td>
       <video src=https://github.com/user-attachments/assets/ac791682-1541-4e6a-aa11-edd9427b977e controls preload></video>
@@ -66,10 +77,16 @@ Due to limited GPU credits and time, I haven't had a chance to dig deeper into t
     <td>
       <video src=https://github.com/user-attachments/assets/7c6ca513-d068-4aa9-8a82-4dfd9063ac4e controls preload></video>
     </td>
+    <td>
+      <video src=https://github.com/user-attachments/assets/7c6ca513-d068-4aa9-8a82-4dfd9063ac4e controls preload></video>
+    </td>
   </tr>
   <tr>
     <td width=300px>
       <video src=https://github.com/user-attachments/assets/0756acef-2f43-4b66-90ba-6dc1d1216904 controls preload></video>
+    </td>
+    <td width=300px>
+      <video src=https://github.com/user-attachments/assets/663ff13d-d716-4a35-8faa-9dcfe955e6a5 controls preload></video>
     </td>
     <td width=300px>
       <video src=https://github.com/user-attachments/assets/663ff13d-d716-4a35-8faa-9dcfe955e6a5 controls preload></video>
@@ -88,7 +105,13 @@ Due to limited GPU credits and time, I haven't had a chance to dig deeper into t
     <td>
       <video src=https://github.com/user-attachments/assets/c34fe89d-0c09-4de3-8601-3d01229a69e3 controls preload></video>
     </td>
+    <td>
+      <video src=https://github.com/user-attachments/assets/c34fe89d-0c09-4de3-8601-3d01229a69e3 controls preload></video>
+    </td>
   </tr>
 </table>
 
 
+## How to setup and run infernece?
+
+Follow the same instructions as in [ByteDance LatentSync](https://github.com/bytedance/LatentSync)
