@@ -41,8 +41,6 @@ While LatentSync often yields clearer faces than pixel-domain diffusion, very hi
 [VideoEnhancer](https://github.com/bhat-prashant/LatentSync/blob/main/latentsync/utils/enhancer.py) within this repo does exactly the same: upscales those syncronized, processed frames which are blurred in the regions that overlaps with the mask (mouth region). This is still Proof-of-Concept implementation aimed at showcasing the usefulness of such an approach in LatentSync. Further optimizations are very necessary to integrate this fully into inference pipeline. 
 
 
-
-
 ## 🎬 Demo
 
 <table class="center">
@@ -54,59 +52,59 @@ While LatentSync often yields clearer faces than pixel-domain diffusion, very hi
   </tr>
   <tr>
     <td>
-      <video src=https://github.com/user-attachments/assets/b778e3c3-ba25-455d-bdf3-d89db0aa75f4 controls preload></video>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo1_video.mp4 controls preload></video>
     </td>
     <td>
-      <video src=https://github.com/user-attachments/assets/ac791682-1541-4e6a-aa11-edd9427b977e controls preload></video>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo1_video.mp4 controls preload></video>
     </td>
     <td>
-      <video src=https://github.com/user-attachments/assets/ac791682-1541-4e6a-aa11-edd9427b977e controls preload></video>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo1_video.mp4 controls preload></video>
     </td>
     <td>
-      <video src=https://github.com/user-attachments/assets/ac791682-1541-4e6a-aa11-edd9427b977e controls preload></video>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo1_video.mp4 controls preload></video>
     </td>
   </tr>
 
   <tr>
     <td>
-      <video src=https://github.com/user-attachments/assets/fb4dc4c1-cc98-43dd-a211-1ff8f843fcfa controls preload></video>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo2_video.mp4 controls preload></video>
     </td>
     <td>
-      <video src=https://github.com/user-attachments/assets/7c6ca513-d068-4aa9-8a82-4dfd9063ac4e controls preload></video>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo2_video.mp4 controls preload></video>
     </td>
     <td>
-      <video src=https://github.com/user-attachments/assets/7c6ca513-d068-4aa9-8a82-4dfd9063ac4e controls preload></video>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo2_video.mp4 controls preload></video>
     </td>
     <td>
-      <video src=https://github.com/user-attachments/assets/7c6ca513-d068-4aa9-8a82-4dfd9063ac4e controls preload></video>
-    </td>
-  </tr>
-  <tr>
-    <td width=300px>
-      <video src=https://github.com/user-attachments/assets/0756acef-2f43-4b66-90ba-6dc1d1216904 controls preload></video>
-    </td>
-    <td width=300px>
-      <video src=https://github.com/user-attachments/assets/663ff13d-d716-4a35-8faa-9dcfe955e6a5 controls preload></video>
-    </td>
-    <td width=300px>
-      <video src=https://github.com/user-attachments/assets/663ff13d-d716-4a35-8faa-9dcfe955e6a5 controls preload></video>
-    </td>
-    <td width=300px>
-      <video src=https://github.com/user-attachments/assets/663ff13d-d716-4a35-8faa-9dcfe955e6a5 controls preload></video>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo2_video.mp4 controls preload></video>
     </td>
   </tr>
   <tr>
     <td>
-      <video src=https://github.com/user-attachments/assets/0f7f9845-68b2-4165-bd08-c7bbe01a0e52 controls preload></video>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo3_video.mp4 controls preload></video>
     </td>
     <td>
-      <video src=https://github.com/user-attachments/assets/c34fe89d-0c09-4de3-8601-3d01229a69e3 controls preload></video>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo3_video.mp4 controls preload></video>
     </td>
     <td>
-      <video src=https://github.com/user-attachments/assets/c34fe89d-0c09-4de3-8601-3d01229a69e3 controls preload></video>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo3_video.mp4 controls preload></video>
     </td>
     <td>
-      <video src=https://github.com/user-attachments/assets/c34fe89d-0c09-4de3-8601-3d01229a69e3 controls preload></video>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo3_video.mp4 controls preload></video>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo4_video.mp4 controls preload></video>
+    </td>
+    <td>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo4_video.mp4 controls preload></video>
+    </td>
+    <td>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo4_video.mp4 controls preload></video>
+    </td>
+    <td>
+      <video src=https://github.com/bhat-prashant/LatentSync/blob/main/assets/demo4_video.mp4 controls preload></video>
     </td>
   </tr>
 </table>
