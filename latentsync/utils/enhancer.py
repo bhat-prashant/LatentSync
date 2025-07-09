@@ -9,10 +9,6 @@ from basicsr.utils import img2tensor, tensor2img
 from basicsr.utils.download_util import load_file_from_url
 import warnings
 from tqdm import tqdm
-from preprocess.affine_transform import combine_video_audio
-import subprocess
-from moviepy import VideoFileClip
-
 
 warnings.filterwarnings("ignore")
 
@@ -59,9 +55,9 @@ class VideoEnhancer:
         return img2tensor(enhanced_resized).to(input_image.device)
 
 
-if __name__ =="__main__":
-    # Process single frame
-    enhancer = VideoEnhancer(mask_path='latentsync/utils/mask.png')
-    input_image = cv2.imread('demo.png')  # Replace with your image file
-    enhanced_image = enhancer.enhance_video(input_image)
-    cv2.imwrite('enhanced_image.png', enhanced_image)
+# if __name__ =="__main__":
+#     # Process single frame
+#     enhancer = VideoEnhancer(mask_path='/home/pbhat1/projects/LatentSync/latentsync/utils/mask.png')
+#     input_image = cv2.imread('/home/pbhat1/projects/LatentSync/demo.png')  
+#     enhanced_image = enhancer.enhance_image(input_image)
+#     cv2.imwrite('enhanced_image.png', enhanced_image)
