@@ -33,9 +33,9 @@ class VideoEnhancer:
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
         mask_indices = np.where(mask_resized == 0)
-        if len(mask_indices[0]) == 0:
-            combined_frame = frame  
-        else:
+        enhanced_resized = frame
+
+        if not len(mask_indices[0]) == 0:
             y_min, y_max = np.min(mask_indices[0]), np.max(mask_indices[0])
             x_min, x_max = np.min(mask_indices[1]), np.max(mask_indices[1])
             crop = frame_rgb[y_min:y_max + 1, x_min:x_max + 1]
