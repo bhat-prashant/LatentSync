@@ -10,7 +10,8 @@
 </div>
 
 
-## 📖 Improvements and roadmap
+## 📖 Improvements and roadmap  
+
 This repo contains optimization efforts (as a part of VidLab7 take-home test), in terms of both quality and speed, to improve LatentSync infernece. The major updates are as follows:
 
 - Profiler `cProfile` added to this repo. The four major performance bottlenecks found were:
