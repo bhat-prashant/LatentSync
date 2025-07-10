@@ -6,6 +6,7 @@ import os
 import shutil
 from typing import Callable, List, Optional, Union
 import subprocess
+from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 import torch
@@ -36,6 +37,7 @@ from ..utils.image_processor import ImageProcessor, load_fixed_mask
 from ..whisper.audio2feature import Audio2Feature
 import tqdm
 import soundfile as sf
+from  ..utils.enhancer import VideoEnhancer
 
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
 
@@ -249,13 +251,22 @@ class LipsyncPipeline(DiffusionPipeline):
         images = images.cpu().numpy()
         return images
 
+    def affine_transform_frame(self, frame):
+        # This method transforms a single frame.
+        return self.image_processor.affine_transform(frame)
+
     def affine_transform_video(self, video_frames: np.ndarray):
         faces = []
         boxes = []
         affine_matrices = []
         print(f"Affine transforming {len(video_frames)} faces...")
-        for frame in tqdm.tqdm(video_frames):
-            face, box, affine_matrix = self.image_processor.affine_transform(frame)
+
+        # Use ThreadPoolExecutor for parallel processing
+        with ThreadPoolExecutor() as executor:
+            results = list(tqdm.tqdm(executor.map(self.affine_transform_frame, video_frames), total=len(video_frames)))
+
+        # Unpack results into separate lists
+        for face, box, affine_matrix in results:
             faces.append(face)
             boxes.append(box)
             affine_matrices.append(affine_matrix)
@@ -263,19 +274,38 @@ class LipsyncPipeline(DiffusionPipeline):
         faces = torch.stack(faces)
         return faces, boxes, affine_matrices
 
+
+    def process_face(self, index, face, video_frame, box, affine_matrix):
+        x1, y1, x2, y2 = box
+        height = int(y2 - y1)
+        width = int(x2 - x1)
+        
+        # Resize the face tensor
+        face_resized = torchvision.transforms.functional.resize(
+            face, size=(height, width), interpolation=transforms.InterpolationMode.BICUBIC, antialias=True
+        )
+        
+        # Call the restoration function (assuming it's defined in the same class context)
+        out_frame = self.image_processor.restorer.restore_img(video_frame, face_resized, affine_matrix)
+        
+        return out_frame
+
     def restore_video(self, faces: torch.Tensor, video_frames: np.ndarray, boxes: list, affine_matrices: list):
         video_frames = video_frames[: len(faces)]
         out_frames = []
         print(f"Restoring {len(faces)} faces...")
-        for index, face in enumerate(tqdm.tqdm(faces)):
-            x1, y1, x2, y2 = boxes[index]
-            height = int(y2 - y1)
-            width = int(x2 - x1)
-            face = torchvision.transforms.functional.resize(
-                face, size=(height, width), interpolation=transforms.InterpolationMode.BICUBIC, antialias=True
-            )
-            out_frame = self.image_processor.restorer.restore_img(video_frames[index], face, affine_matrices[index])
-            out_frames.append(out_frame)
+        
+        with ThreadPoolExecutor() as executor:
+            # Map the processing function across the data
+            futures = [
+                executor.submit(self.process_face, index, faces[index], video_frames[index], boxes[index], affine_matrices[index])
+                for index in range(len(faces))
+            ]
+            
+            # Gather results as they complete
+            for future in tqdm.tqdm(futures):
+                out_frames.append(future.result())
+
         return np.stack(out_frames, axis=0)
 
     def loop_video(self, whisper_chunks: list, video_frames: np.ndarray):
@@ -322,6 +352,7 @@ class LipsyncPipeline(DiffusionPipeline):
         width: Optional[int] = None,
         num_inference_steps: int = 20,
         guidance_scale: float = 1.5,
+        image_enhance: bool = False,
         weight_dtype: Optional[torch.dtype] = torch.float16,
         eta: float = 0.0,
         mask_image_path: str = "latentsync/utils/mask.png",
@@ -333,6 +364,10 @@ class LipsyncPipeline(DiffusionPipeline):
     ):
         is_train = self.unet.training
         self.unet.eval()
+        
+        self.image_enhance = image_enhance
+        if self.image_enhance:
+            self.enhancer = VideoEnhancer()
 
         check_ffmpeg_installed()
 
@@ -455,6 +490,12 @@ class LipsyncPipeline(DiffusionPipeline):
             decoded_latents = self.paste_surrounding_pixels_back(
                 decoded_latents, ref_pixel_values, 1 - masks, device, weight_dtype
             )
+
+            if self.image_enhance:
+                # Enhance those frames which tend to be blurred around mouth region. 
+                for dec_lat in decoded_latents:
+                    dec_lat = self.enhancer.enhance_image(dec_lat)
+
             synced_video_frames.append(decoded_latents)
 
         synced_video_frames = self.restore_video(torch.cat(synced_video_frames), video_frames, boxes, affine_matrices)

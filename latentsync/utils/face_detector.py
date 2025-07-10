@@ -3,11 +3,12 @@ import numpy as np
 import torch
 
 INSIGHTFACE_DETECT_SIZE = 512
+MODEL_PACK_NAME = 'buffalo_s' # 'buffalo_s', 'buffalo_m', 'buffalo_l' (default)
 
 
 class FaceDetector:
     def __init__(self, device="cuda"):
-        self.app = FaceAnalysis(
+        self.app = FaceAnalysis(name=MODEL_PACK_NAME, 
             allowed_modules=["detection", "landmark_2d_106"],
             root="checkpoints/auxiliary",
             providers=["CUDAExecutionProvider"],
